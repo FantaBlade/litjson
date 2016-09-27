@@ -222,7 +222,7 @@ namespace LitJson
 
             set
             {
-                if (! (key is String))
+                if (!(key is String))
                     throw new ArgumentException(
                         "The key has to be a string");
 
@@ -1031,23 +1031,23 @@ namespace LitJson
                     break;
 
                 case JsonType.String:
-                    inst_string = default (String);
+                    inst_string = default(String);
                     break;
 
                 case JsonType.Int:
-                    inst_int = default (Int32);
+                    inst_int = default(Int32);
                     break;
 
                 case JsonType.Long:
-                    inst_long = default (Int64);
+                    inst_long = default(Int64);
                     break;
 
                 case JsonType.Double:
-                    inst_double = default (Double);
+                    inst_double = default(Double);
                     break;
 
                 case JsonType.Boolean:
-                    inst_boolean = default (Boolean);
+                    inst_boolean = default(Boolean);
                     break;
             }
 
@@ -1091,7 +1091,7 @@ namespace LitJson
                     return inst_boolean.ToString();
 
                 case JsonType.Double:
-                    return inst_double.ToString();
+                    return inst_double.ToString(CultureInfo.InvariantCulture);
 
                 case JsonType.Int:
                     return inst_int.ToString();
@@ -1114,15 +1114,36 @@ namespace LitJson
             return EnsureDictionary().Contains(key);
         }
 
+        public T Get<T>(int index, T defaultValue = default(T))
+        {
+            if (!IsArray)
+            {
+                return defaultValue;
+            }
+            try
+            {
+                return (T) Convert.ChangeType(this[index].ToString(), typeof (T), CultureInfo.InvariantCulture);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+                return defaultValue;
+            }
+        }
+
         public T Get<T>(string key, T defaultValue = default(T))
         {
-            if (!Contains(key)) return defaultValue;
+            if (!Contains(key))
+            {
+                return defaultValue;
+            }
             try
             {
                 return (T) Convert.ChangeType(Get(key).ToString(), typeof (T), CultureInfo.InvariantCulture);
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Debug.LogError(e);
                 return defaultValue;
             }
         }
@@ -1134,7 +1155,7 @@ namespace LitJson
                 var list = new T[Count];
                 for (int i = 0; i < Count; i++)
                 {
-                    list[i] = ((T) Convert.ChangeType(this[i].ToString(), typeof (T), CultureInfo.InvariantCulture));
+                    list[i] = (T) Convert.ChangeType(this[i].ToString(), typeof (T), CultureInfo.InvariantCulture);
                 }
                 return list;
             }
